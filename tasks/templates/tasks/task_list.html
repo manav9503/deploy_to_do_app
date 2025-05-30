@@ -1,0 +1,52 @@
+<!-- tasks/templates/tasks/task_list.html -->
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+    <div class="task-list">
+        {% for task in tasks %}
+            <div class="task-card {% if task.completed %}completed{% endif %}">
+                <div class="task-info">
+                    <h3>{{ task.title }}</h3>
+                    {% if task.description %}
+                        <p>{{ task.description }}</p>
+                    {% endif %}
+                    <div class="task-meta">
+                        <span class="date">
+                            <i class="far fa-calendar"></i> 
+                            {{ task.created_at|date:"M d, Y" }}
+                        </span>
+                        {% if task.due_date %}
+                            <span class="due-date {% if task.is_overdue %}overdue{% endif %}">
+                                <i class="far fa-clock"></i> Due: {{ task.due_date }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a href="{% url 'task-update' task.pk %}" class="btn edit-btn">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'task-delete' task.pk %}" class="btn delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                    <form action="{% url 'task-update' task.pk %}" method="post" class="complete-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="completed" value="{{ task.completed|yesno:'False,True' }}">
+                        <button type="submit" class="btn complete-btn">
+                            <i class="fas fa-{% if task.completed %}check-circle{% else %}circle{% endif %}"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <i class="far fa-check-circle"></i>
+                <h3>No tasks yet</h3>
+                <p>Add a task to get started!</p>
+                <a href="{% url 'task-create' %}" class="btn add-btn">
+                    <i class="fas fa-plus"></i> Add your first task
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
